@@ -36,7 +36,7 @@ struct EmbeddedTests {
     
     @Test("Load JSON file using @Embedded.json")
     func testLoadJSON() {
-        @Embedded.json("TestData/sample.json", bundle: Bundle.module)
+        @Embedded.json(Bundle.module, path: "TestData/sample.json")
         var user: User
         
         #expect(user.name == "Test User")
@@ -47,7 +47,7 @@ struct EmbeddedTests {
     
     @Test("JSON property wrapper maintains value")
     func testJSONValueConsistency() {
-        @Embedded.json("TestData/sample.json", bundle: Bundle.module)
+        @Embedded.json(Bundle.module, path: "TestData/sample.json")
         var user: User
         
         let firstAccess = user
@@ -60,7 +60,7 @@ struct EmbeddedTests {
     
     @Test("Load YAML file using @Embedded.yaml")
     func testLoadYAML() {
-        @Embedded.yaml("TestData/config.yaml", bundle: Bundle.module)
+        @Embedded.yaml(Bundle.module, path: "TestData/config.yaml")
         var config: Config
         
         #expect(config.app.name == "TestApp")
@@ -76,7 +76,7 @@ struct EmbeddedTests {
     
     @Test("YAML property wrapper maintains value")
     func testYAMLValueConsistency() {
-        @Embedded.yaml("TestData/config.yaml", bundle: Bundle.module)
+        @Embedded.yaml(Bundle.module, path: "TestData/config.yaml")
         var config: Config
         
         let firstAccess = config

@@ -48,10 +48,10 @@ struct User: Decodable {
 }
 
 struct MyApp {
-    @Embedded.json("Resources/users.json")
+    @Embedded.json(Bundle.main, path: "Resources/users.json")
     var users: [User]
     
-    @Embedded.yaml("Config/settings.yaml")
+    @Embedded.yaml(Bundle.main, path: "Config/settings.yaml")
     var config: Config
     
     func printInfo() {
@@ -76,7 +76,7 @@ struct APITests {
         let expected: String
     }
     
-    @Test("URL Validation", arguments: Embedded.getJSON("TestData/url_tests.json", as: [TestCase].self))
+    @Test("URL Validation", arguments: Embedded.getJSON(Bundle.module, path: "TestData/url_tests.json", as: [TestCase].self))
     func testURLs(testCase: TestCase) {
         // Test implementation
     }
@@ -91,13 +91,13 @@ You can also load resources directly without property wrappers:
 import SwiftEmbed
 
 // Load and decode JSON
-let users = Embedded.getJSON("users.json", as: [User].self)
+let users = Embedded.getJSON(Bundle.main, path: "users.json", as: [User].self)
 
 // Load and decode YAML
-let config = Embedded.getYAML("config.yaml", as: Config.self)
+let config = Embedded.getYAML(Bundle.main, path: "config.yaml", as: Config.self)
 
-// Specify bundle explicitly
-let data = Embedded.getJSON("data.json", bundle: Bundle.module, as: MyData.self)
+// In tests with Bundle.module
+let testData = Embedded.getJSON(Bundle.module, path: "TestData/tests.json", as: [TestCase].self)
 ```
 
 ## File Organization
