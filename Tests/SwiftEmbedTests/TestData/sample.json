@@ -1,0 +1,6 @@
+{
+  "name": "Test User",
+  "age": 30,
+  "email": "test@example.com",
+  "tags": ["swift", "testing", "json"]
+}
