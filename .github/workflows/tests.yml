@@ -13,9 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_15.2.app
-    
     - name: Swift version
       run: swift --version
     
