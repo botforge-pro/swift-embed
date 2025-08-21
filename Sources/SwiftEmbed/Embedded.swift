@@ -3,6 +3,20 @@ import Yams
 
 /// Namespace for embedded resource property wrappers
 public enum Embedded {
+    /// Load JSON resource and decode it to the specified type
+    public static func getJSON<T: Decodable>(_ path: String, bundle: Bundle = Bundle.main, as type: T.Type = T.self) -> T {
+        @Embedded.json(path, bundle: bundle)
+        var value: T
+        return value
+    }
+    
+    /// Load YAML resource and decode it to the specified type
+    public static func getYAML<T: Decodable>(_ path: String, bundle: Bundle = Bundle.main, as type: T.Type = T.self) -> T {
+        @Embedded.yaml(path, bundle: bundle)
+        var value: T
+        return value
+    }
+    
     @propertyWrapper
     public struct json<T: Decodable> {
         private let value: T

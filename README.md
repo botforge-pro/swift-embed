@@ -27,29 +27,11 @@ dependencies: [
 
 ## Usage
 
-### JSON Files
+SwiftEmbed provides two ways to load resources:
+- **Property wrappers** (`@Embedded.json` / `@Embedded.yaml`) - for class/struct properties
+- **Direct loading** (`Embedded.getJSON` / `Embedded.getYAML`) - for immediate use
 
-```swift
-import SwiftEmbed
-
-struct User: Decodable {
-    let name: String
-    let email: String
-}
-
-struct MyClass {
-    @Embedded.json("Resources/users.json")
-    var users: [User]
-    
-    func printUsers() {
-        for user in users {
-            print("\(user.name): \(user.email)")
-        }
-    }
-}
-```
-
-### YAML Files
+### Property Wrappers
 
 ```swift
 import SwiftEmbed
@@ -57,22 +39,31 @@ import SwiftEmbed
 struct Config: Decodable {
     let apiURL: String
     let timeout: Int
+    let features: [String]
 }
 
-struct Settings {
+struct User: Decodable {
+    let name: String
+    let email: String
+}
+
+struct MyApp {
+    @Embedded.json("Resources/users.json")
+    var users: [User]
+    
     @Embedded.yaml("Config/settings.yaml")
     var config: Config
     
-    func configure() {
-        print("API URL: \(config.apiURL)")
-        print("Timeout: \(config.timeout)s")
+    func printInfo() {
+        print("API: \(config.apiURL)")
+        print("Users: \(users.count)")
     }
 }
 ```
 
 ### In Tests
 
-Perfect for loading test data:
+Perfect for loading test data with parametrized tests:
 
 ```swift
 import Testing
@@ -85,14 +76,28 @@ struct APITests {
         let expected: String
     }
     
-    @Embedded.json("TestData/url_tests.json")
-    var testCases: [TestCase]
-    
-    @Test("URL Validation", arguments: testCases)
+    @Test("URL Validation", arguments: Embedded.getJSON("TestData/url_tests.json", as: [TestCase].self))
     func testURLs(testCase: TestCase) {
         // Test implementation
     }
 }
+```
+
+### Direct Loading
+
+You can also load resources directly without property wrappers:
+
+```swift
+import SwiftEmbed
+
+// Load and decode JSON
+let users = Embedded.getJSON("users.json", as: [User].self)
+
+// Load and decode YAML
+let config = Embedded.getYAML("config.yaml", as: Config.self)
+
+// Specify bundle explicitly
+let data = Embedded.getJSON("data.json", bundle: Bundle.module, as: MyData.self)
 ```
 
 ## File Organization
