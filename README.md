@@ -1,3 +1,5 @@
+[![Tests](https://github.com/botforge-pro/swift-embed/actions/workflows/tests.yml/badge.svg)](https://github.com/botforge-pro/swift-embed/actions/workflows/tests.yml)
+
 # SwiftEmbed
 
 A lightweight Swift library for embedding JSON and YAML resources using property wrappers.
