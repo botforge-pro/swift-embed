@@ -128,10 +128,13 @@ For Swift packages, ensure resources are declared in `Package.swift`:
 .target(
     name: "MyApp",
     resources: [
-        .copy("Resources")
+        .copy("Resources")  // Use .copy() to preserve directory structure
+        // .process() will flatten the directory structure
     ]
 )
 ```
+
+**Important:** Always use `.copy()` instead of `.process()` to preserve your directory structure. The `.process()` rule will flatten directories and may cause resource loading to fail.
 
 ## Requirements
 
