@@ -2,13 +2,14 @@
 
 # SwiftEmbed
 
-A lightweight Swift library for embedding JSON and YAML resources using property wrappers.
+A lightweight Swift library for embedding JSON, YAML and text resources using property wrappers.
 
 ## Features
 
 - 🎯 **Simple API** - Clean property wrapper syntax
 - 📦 **JSON Support** - Built-in JSON decoding
 - 📝 **YAML Support** - Full YAML decoding via Yams
+- 📄 **Text Support** - Load plain text files as strings
 - 🔒 **Type Safe** - Compile-time type checking with Decodable
 - 🚀 **Zero Runtime Cost** - Resources loaded once and cached
 - 📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS
@@ -28,8 +29,8 @@ dependencies: [
 ## Usage
 
 SwiftEmbed provides two ways to load resources:
-- **Property wrappers** (`@Embedded.json` / `@Embedded.yaml`) - for class/struct properties
-- **Direct loading** (`Embedded.getJSON` / `Embedded.getYAML`) - for immediate use
+- **Property wrappers** (`@Embedded.json` / `@Embedded.yaml` / `@Embedded.text`) - for class/struct properties
+- **Direct loading** (`Embedded.getJSON` / `Embedded.getYAML` / `Embedded.getText`) - for immediate use
 
 ### Property Wrappers
 
@@ -54,9 +55,13 @@ struct MyApp {
     @Embedded.yaml(Bundle.main, path: "Config/settings.yaml")
     var config: Config
     
+    @Embedded.text(Bundle.main, path: "Resources/template.html")
+    var htmlTemplate: String
+    
     func printInfo() {
         print("API: \(config.apiURL)")
         print("Users: \(users.count)")
+        print("Template size: \(htmlTemplate.count) bytes")
     }
 }
 ```
@@ -95,6 +100,9 @@ let users = Embedded.getJSON(Bundle.main, path: "users.json", as: [User].self)
 
 // Load and decode YAML
 let config = Embedded.getYAML(Bundle.main, path: "config.yaml", as: Config.self)
+
+// Load plain text
+let template = Embedded.getText(Bundle.main, path: "template.html")
 
 // In tests with Bundle.module
 let testData = Embedded.getJSON(Bundle.module, path: "TestData/tests.json", as: [TestCase].self)

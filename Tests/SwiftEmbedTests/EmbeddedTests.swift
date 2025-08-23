@@ -84,4 +84,36 @@ struct EmbeddedTests {
         
         #expect(firstAccess == secondAccess)
     }
+    
+    // MARK: - Text Tests
+    
+    @Test("Load text file using @Embedded.text")
+    func testLoadText() {
+        @Embedded.text(Bundle.module, path: "TestData/sample.txt")
+        var content: String
+        
+        #expect(content.contains("Hello, World!"))
+        #expect(content.contains("This is a test text file."))
+        #expect(content.contains("With multiple lines."))
+    }
+    
+    @Test("Load text file using getText method")
+    func testGetText() {
+        let content = Embedded.getText(Bundle.module, path: "TestData/sample.txt")
+        
+        #expect(content.contains("Hello, World!"))
+        #expect(content.contains("This is a test text file."))
+        #expect(content.contains("With multiple lines."))
+    }
+    
+    @Test("Text property wrapper maintains value")
+    func testTextValueConsistency() {
+        @Embedded.text(Bundle.module, path: "TestData/sample.txt")
+        var content: String
+        
+        let firstAccess = content
+        let secondAccess = content
+        
+        #expect(firstAccess == secondAccess)
+    }
 }
