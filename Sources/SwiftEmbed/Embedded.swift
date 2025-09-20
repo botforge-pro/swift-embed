@@ -8,14 +8,14 @@ public enum Embedded {
     nonisolated(unsafe) private static let cache = NSCache<NSString, AnyObject>()
     public static func getJSON<T: Decodable>(_ bundle: Bundle, path: String, as type: T.Type = T.self) -> T {
         let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):json:\(T.self)" as NSString
-        
+
         if let cached = cache.object(forKey: cacheKey),
            let typedBox = cached as? Box<T> {
             return typedBox.value
         }
-        
+
         let data = loadData(path: path, bundle: bundle)
-        
+
         do {
             let decoder = JSONDecoder()
             let result = try decoder.decode(T.self, from: data)
@@ -28,14 +28,14 @@ public enum Embedded {
 
     public static func getYAML<T: Decodable>(_ bundle: Bundle, path: String, as type: T.Type = T.self) -> T {
         let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):yaml:\(T.self)" as NSString
-        
+
         if let cached = cache.object(forKey: cacheKey),
            let typedBox = cached as? Box<T> {
             return typedBox.value
         }
-        
+
         let data = loadData(path: path, bundle: bundle)
-        
+
         do {
             let decoder = YAMLDecoder()
             let result = try decoder.decode(T.self, from: data)
@@ -48,17 +48,17 @@ public enum Embedded {
 
     public static func getText(_ bundle: Bundle, path: String) -> String {
         let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):text" as NSString
-        
+
         if let cached = cache.object(forKey: cacheKey) as? NSString {
             return cached as String
         }
-        
+
         let data = loadData(path: path, bundle: bundle)
-        
+
         guard let string = String(data: data, encoding: .utf8) else {
             fatalError("Failed to decode text from '\(path)': not valid UTF-8")
         }
-        
+
         cache.setObject(string as NSString, forKey: cacheKey)
         return string
     }
@@ -135,7 +135,7 @@ private final class Box<T>: NSObject {
 
 private extension Embedded {
     static func loadData(path: String, bundle: Bundle) -> Data {
-        
+
         // Split path into components
         let pathComponents = path.split(separator: "/").map(String.init)
         let filename = pathComponents.last ?? path
