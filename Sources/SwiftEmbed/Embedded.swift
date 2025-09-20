@@ -72,14 +72,7 @@ public enum Embedded {
         }
 
         public init(_ bundle: Bundle, path: String) {
-            let data = Self.loadData(path: path, bundle: bundle)
-
-            do {
-                let decoder = JSONDecoder()
-                self.value = try decoder.decode(T.self, from: data)
-            } catch {
-                fatalError("Failed to decode JSON from '\(path)': \(error)")
-            }
+            self.value = Embedded.getJSON(bundle, path: path, as: T.self)
         }
     }
 
@@ -92,14 +85,7 @@ public enum Embedded {
         }
 
         public init(_ bundle: Bundle, path: String) {
-            let data = Self.loadData(path: path, bundle: bundle)
-
-            do {
-                let decoder = YAMLDecoder()
-                self.value = try decoder.decode(T.self, from: data)
-            } catch {
-                fatalError("Failed to decode YAML from '\(path)': \(error)")
-            }
+            self.value = Embedded.getYAML(bundle, path: path, as: T.self)
         }
     }
 
@@ -112,13 +98,7 @@ public enum Embedded {
         }
 
         public init(_ bundle: Bundle, path: String) {
-            let data = Self.loadData(path: path, bundle: bundle)
-
-            guard let string = String(data: data, encoding: .utf8) else {
-                fatalError("Failed to decode text from '\(path)': not valid UTF-8")
-            }
-
-            self.value = string
+            self.value = Embedded.getText(bundle, path: path)
         }
     }
 }
@@ -162,20 +142,3 @@ private extension Embedded {
     }
 }
 
-private extension Embedded.JSON {
-    static func loadData(path: String, bundle: Bundle) -> Data {
-        Embedded.loadData(path: path, bundle: bundle)
-    }
-}
-
-private extension Embedded.YAML {
-    static func loadData(path: String, bundle: Bundle) -> Data {
-        Embedded.loadData(path: path, bundle: bundle)
-    }
-}
-
-private extension Embedded.Text {
-    static func loadData(path: String, bundle: Bundle) -> Data {
-        Embedded.loadData(path: path, bundle: bundle)
-    }
-}
