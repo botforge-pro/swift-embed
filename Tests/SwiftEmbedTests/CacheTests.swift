@@ -66,19 +66,21 @@ struct CacheTests {
         let tags: [String]
     }
 
+    struct ConfigApp: Decodable, Equatable {
+        let name: String
+        let version: String
+        let debug: Bool
+    }
+
+    struct ConfigDatabase: Decodable, Equatable {
+        let host: String
+        let port: Int
+        let name: String
+    }
+
     struct Config: Decodable, Equatable {
-        struct App: Decodable, Equatable {
-            let name: String
-            let version: String
-            let debug: Bool
-        }
-        struct Database: Decodable, Equatable {
-            let host: String
-            let port: Int
-            let name: String
-        }
-        let app: App
-        let database: Database
+        let app: ConfigApp
+        let database: ConfigDatabase
         let features: [String]
     }
 }

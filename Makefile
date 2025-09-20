@@ -5,7 +5,7 @@ all: clean build test
 
 # Run tests
 test:
-	swift test
+	swift test -Xswiftc -warnings-as-errors
 
 # Clean build artifacts
 clean:
@@ -14,7 +14,7 @@ clean:
 
 # Build the library
 build:
-	swift build
+	swift build -Xswiftc -warnings-as-errors
 
 lint:
 	swiftlint
