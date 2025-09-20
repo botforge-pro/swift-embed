@@ -2,16 +2,17 @@
 
 # SwiftEmbed
 
-A lightweight Swift library for embedding JSON, YAML and text resources using property wrappers.
+A lightweight Swift library for embedding JSON, YAML and text resources with automatic caching and Swift 6 concurrency support.
 
 ## Features
 
-- 🎯 **Simple API** - Clean property wrapper syntax
+- 🎯 **Simple API** - Clean property wrapper and computed property syntax
 - 📦 **JSON Support** - Built-in JSON decoding
 - 📝 **YAML Support** - Full YAML decoding via Yams
 - 📄 **Text Support** - Load plain text files as strings
 - 🔒 **Type Safe** - Compile-time type checking with Decodable
-- 🚀 **Zero Runtime Cost** - Resources loaded once and cached
+- ⚡ **Automatic Caching** - Resources cached after first load
+- 🔄 **Swift 6 Ready** - No concurrency warnings with static properties
 - 📱 **Cross-Platform** - Works on iOS, macOS, tvOS, watchOS
 
 ## Installation
@@ -22,31 +23,47 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/botforge-pro/swift-embed.git", from: "1.4.0")
+    .package(url: "https://github.com/botforge-pro/swift-embed.git", from: "2.0.0")
 ]
 ```
 
 ## Usage
 
-SwiftEmbed provides two ways to load resources:
-- **Property wrappers** (`@Embedded.JSON` / `@Embedded.YAML` / `@Embedded.Text`) - for class/struct properties
-- **Direct loading** (`Embedded.getJSON` / `Embedded.getYAML` / `Embedded.getText`) - for immediate use
+SwiftEmbed provides three ways to load resources:
 
-### Property Wrappers
+### 1. Computed Properties (Recommended for Swift 6)
+
+Best for static configuration and avoids Swift 6 concurrency warnings:
 
 ```swift
 import SwiftEmbed
 
-struct Config: Decodable {
-    let apiURL: String
-    let timeout: Int
-    let features: [String]
+struct AppConfig {
+    // Clean syntax, no Swift 6 warnings, automatic caching
+    static var config: Config {
+        Embedded.getJSON(Bundle.main, path: "Resources/config.json")
+    }
+    
+    static var users: [User] {
+        Embedded.getJSON(Bundle.main, path: "Resources/users.json")
+    }
+    
+    static var template: String {
+        Embedded.getText(Bundle.main, path: "Resources/template.html")
+    }
 }
 
-struct User: Decodable {
-    let name: String
-    let email: String
-}
+// Usage
+let apiURL = AppConfig.config.apiURL  // Loaded and cached on first access
+let userCount = AppConfig.users.count // Retrieved from cache
+```
+
+### 2. Property Wrappers
+
+For instance properties in classes/structs:
+
+```swift
+import SwiftEmbed
 
 struct MyApp {
     @Embedded.JSON(Bundle.main, path: "Resources/users.json")
@@ -57,40 +74,12 @@ struct MyApp {
     
     @Embedded.Text(Bundle.main, path: "Resources/template.html")
     var htmlTemplate: String
-    
-    func printInfo() {
-        print("API: \(config.apiURL)")
-        print("Users: \(users.count)")
-        print("Template size: \(htmlTemplate.count) bytes")
-    }
 }
 ```
 
-### In Tests
+### 3. Direct Loading
 
-Perfect for loading test data with parametrized tests:
-
-```swift
-import Testing
-import SwiftEmbed
-
-@Suite("API Tests")
-struct APITests {
-    struct TestCase: Decodable {
-        let input: String
-        let expected: String
-    }
-    
-    @Test("URL Validation", arguments: Embedded.getJSON(Bundle.module, path: "TestData/url_tests.json", as: [TestCase].self))
-    func testURLs(testCase: TestCase) {
-        // Test implementation
-    }
-}
-```
-
-### Direct Loading
-
-You can also load resources directly without property wrappers:
+For immediate use or dynamic loading:
 
 ```swift
 import SwiftEmbed
@@ -103,9 +92,41 @@ let config = Embedded.getYAML(Bundle.main, path: "config.yaml", as: Config.self)
 
 // Load plain text
 let template = Embedded.getText(Bundle.main, path: "template.html")
+```
 
-// In tests with Bundle.module
-let testData = Embedded.getJSON(Bundle.module, path: "TestData/tests.json", as: [TestCase].self)
+## Caching
+
+All methods use an internal cache powered by `NSCache`:
+- Resources are loaded from disk only once
+- Subsequent accesses return cached values
+- Memory-safe with automatic purging under pressure
+- Thread-safe for concurrent access
+
+## Testing
+
+Perfect for loading test data:
+
+```swift
+import Testing
+import SwiftEmbed
+
+@Suite("API Tests")
+struct APITests {
+    struct TestCase: Decodable {
+        let input: String
+        let expected: String
+    }
+    
+    // Load test data once, cached for all test runs
+    static var testCases: [TestCase] {
+        Embedded.getJSON(Bundle.module, path: "TestData/url_tests.json")
+    }
+    
+    @Test("URL Validation", arguments: testCases)
+    func testURLs(testCase: TestCase) {
+        // Test implementation
+    }
+}
 ```
 
 ## File Organization
@@ -135,6 +156,30 @@ For Swift packages, ensure resources are declared in `Package.swift`:
 ```
 
 **Important:** Always use `.copy()` instead of `.process()` to preserve your directory structure. The `.process()` rule will flatten directories and may cause resource loading to fail.
+
+## Swift 6 Concurrency
+
+SwiftEmbed is fully compatible with Swift 6's strict concurrency checking:
+
+```swift
+// ✅ No warnings - computed property approach
+struct MyConfig {
+    static var settings: Settings {
+        Embedded.getJSON(Bundle.module, path: "config.json")
+    }
+}
+
+// ✅ No warnings - static let with direct call
+struct MyData {
+    static let data = Embedded.getJSON(Bundle.module, path: "data.json", as: DataModel.self)
+}
+
+// ⚠️ Warning with property wrapper on static var
+struct BadExample {
+    @Embedded.JSON(Bundle.module, path: "config.json")
+    static var config: Config  // Swift 6 warning: static var not concurrency-safe
+}
+```
 
 ## Requirements
 

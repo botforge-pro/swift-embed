@@ -3,38 +3,63 @@ import Yams
 
 /// Namespace for embedded resource property wrappers
 public enum Embedded {
-    /// Load JSON resource and decode it to the specified type
+    // Apple docs: "You can add, remove, and query items in the cache from different threads"
+    // https://developer.apple.com/documentation/foundation/nscache
+    nonisolated(unsafe) private static let cache = NSCache<NSString, AnyObject>()
     public static func getJSON<T: Decodable>(_ bundle: Bundle, path: String, as type: T.Type = T.self) -> T {
+        let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):json:\(T.self)" as NSString
+        
+        if let cached = cache.object(forKey: cacheKey),
+           let typedBox = cached as? Box<T> {
+            return typedBox.value
+        }
+        
         let data = loadData(path: path, bundle: bundle)
-
+        
         do {
             let decoder = JSONDecoder()
-            return try decoder.decode(T.self, from: data)
+            let result = try decoder.decode(T.self, from: data)
+            cache.setObject(Box(result), forKey: cacheKey)
+            return result
         } catch {
             fatalError("Failed to decode JSON from '\(path)': \(error)")
         }
     }
 
-    /// Load YAML resource and decode it to the specified type
     public static func getYAML<T: Decodable>(_ bundle: Bundle, path: String, as type: T.Type = T.self) -> T {
+        let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):yaml:\(T.self)" as NSString
+        
+        if let cached = cache.object(forKey: cacheKey),
+           let typedBox = cached as? Box<T> {
+            return typedBox.value
+        }
+        
         let data = loadData(path: path, bundle: bundle)
-
+        
         do {
             let decoder = YAMLDecoder()
-            return try decoder.decode(T.self, from: data)
+            let result = try decoder.decode(T.self, from: data)
+            cache.setObject(Box(result), forKey: cacheKey)
+            return result
         } catch {
             fatalError("Failed to decode YAML from '\(path)': \(error)")
         }
     }
 
-    /// Load text resource as String
     public static func getText(_ bundle: Bundle, path: String) -> String {
+        let cacheKey = "\(bundle.bundleIdentifier ?? "unknown"):\(path):text" as NSString
+        
+        if let cached = cache.object(forKey: cacheKey) as? NSString {
+            return cached as String
+        }
+        
         let data = loadData(path: path, bundle: bundle)
-
+        
         guard let string = String(data: data, encoding: .utf8) else {
             fatalError("Failed to decode text from '\(path)': not valid UTF-8")
         }
-
+        
+        cache.setObject(string as NSString, forKey: cacheKey)
         return string
     }
 
@@ -99,18 +124,24 @@ public enum Embedded {
 }
 
 // MARK: - Private Helpers
+
+// Helper class to box values for type-safe caching
+private final class Box<T>: NSObject {
+    let value: T
+    init(_ value: T) {
+        self.value = value
+    }
+}
+
 private extension Embedded {
     static func loadData(path: String, bundle: Bundle) -> Data {
+        
         // Split path into components
         let pathComponents = path.split(separator: "/").map(String.init)
-
-        // Extract filename and extension from last component
         let filename = pathComponents.last ?? path
         let url = URL(fileURLWithPath: filename)
         let nameWithoutExtension = url.deletingPathExtension().lastPathComponent
         let fileExtension = url.pathExtension
-
-        // Get subdirectory if path has multiple components
         let subdirectory: String? = pathComponents.count > 1
             ? pathComponents.dropLast().joined(separator: "/")
             : nil
