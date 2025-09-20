@@ -16,13 +16,11 @@ clean:
 build:
 	swift build
 
-# Format code
-format:
-	swift-format . -i -r
-
-# Lint code
 lint:
-	swift-format lint . -r
+	swiftlint
+
+lint-fix:
+	swiftlint --fix
 
 # Create a new release
 release:

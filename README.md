@@ -29,7 +29,7 @@ dependencies: [
 ## Usage
 
 SwiftEmbed provides two ways to load resources:
-- **Property wrappers** (`@Embedded.json` / `@Embedded.yaml` / `@Embedded.text`) - for class/struct properties
+- **Property wrappers** (`@Embedded.JSON` / `@Embedded.YAML` / `@Embedded.Text`) - for class/struct properties
 - **Direct loading** (`Embedded.getJSON` / `Embedded.getYAML` / `Embedded.getText`) - for immediate use
 
 ### Property Wrappers
@@ -49,13 +49,13 @@ struct User: Decodable {
 }
 
 struct MyApp {
-    @Embedded.json(Bundle.main, path: "Resources/users.json")
+    @Embedded.JSON(Bundle.main, path: "Resources/users.json")
     var users: [User]
     
-    @Embedded.yaml(Bundle.main, path: "Config/settings.yaml")
+    @Embedded.YAML(Bundle.main, path: "Config/settings.yaml")
     var config: Config
     
-    @Embedded.text(Bundle.main, path: "Resources/template.html")
+    @Embedded.Text(Bundle.main, path: "Resources/template.html")
     var htmlTemplate: String
     
     func printInfo() {
