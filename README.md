@@ -181,6 +181,32 @@ struct BadExample {
 }
 ```
 
+## Known Issues
+
+### Xcode 14+ Simulator Build Error with "Resources" Folder
+
+If you encounter a code signing error when building for iOS Simulator in Xcode 14 or later:
+
+```
+CodeSign failed with a nonzero exit code
+bundle format unrecognized, invalid, or unsuitable
+```
+
+This is a known Xcode issue where it tries to code sign SPM resource bundles named "Resources" for the simulator, which is not supported.
+
+**Solution:** Rename your resources folder to something else (e.g., `TestData`, `Assets`, `Files`):
+
+```swift
+.target(
+    name: "MyApp",
+    resources: [
+        .copy("TestData")  // Instead of "Resources"
+    ]
+)
+```
+
+This issue only affects iOS Simulator builds. Device builds work fine with any folder name.
+
 ## Requirements
 
 - Swift 6.0+
