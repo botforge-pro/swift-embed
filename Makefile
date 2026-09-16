@@ -1,4 +1,4 @@
-.PHONY: test clean build release format lint
+.PHONY: test clean build docs format lint lint-fix
 
 # Default target
 all: clean build test
@@ -16,9 +16,15 @@ clean:
 build:
 	swift build -Xswiftc -warnings-as-errors
 
+docs:
+	swift package --allow-writing-to-directory .build/docc generate-documentation \
+		--target SwiftEmbed --output-path .build/docc \
+		--warnings-as-errors \
+		--transform-for-static-hosting \
+		--hosting-base-path swift-embed
+
 lint:
 	swiftlint
 
 lint-fix:
 	swiftlint --fix
-

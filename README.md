@@ -1,4 +1,5 @@
 [![Tests](https://github.com/botforge-pro/swift-embed/actions/workflows/tests.yml/badge.svg)](https://github.com/botforge-pro/swift-embed/actions/workflows/tests.yml)
+[![Documentation](https://github.com/botforge-pro/swift-embed/actions/workflows/documentation.yml/badge.svg)](https://botforge-pro.github.io/swift-embed/documentation/swiftembed/)
 
 # SwiftEmbed
 
@@ -211,3 +212,16 @@ This issue only affects iOS Simulator builds. Device builds work fine with any f
 
 - Swift 6.0+
 - iOS 15.0+ / macOS 12.0+ / tvOS 15.0+ / watchOS 8.0+
+
+## Documentation
+
+The [Swift-DocC API reference](https://botforge-pro.github.io/swift-embed/documentation/swiftembed/)
+is generated from the public API on every push to `main`.
+
+## Lines of Code
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/loc-history-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset=".github/loc-history-light.svg">
+  <img src=".github/loc-history.svg" alt="Lines of code over time">
+</picture>

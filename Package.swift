@@ -17,7 +17,8 @@ let package = Package(
             targets: ["SwiftEmbed"])
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/Yams.git", from: "6.1.0")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "6.1.0"),
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
         .target(

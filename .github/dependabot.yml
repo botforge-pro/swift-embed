@@ -7,3 +7,7 @@ updates:
     open-pull-requests-limit: 5
     reviewers:
       - "smee"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
