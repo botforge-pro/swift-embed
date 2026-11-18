@@ -1,16 +1,11 @@
-.PHONY: test clean build docs format lint lint-fix
+.PHONY: test build docs format lint lint-fix
 
 # Default target
-all: clean build test
+all: build test
 
 # Run tests
 test:
 	swift test -Xswiftc -warnings-as-errors
-
-# Clean build artifacts
-clean:
-	swift package clean
-	rm -rf .build
 
 # Build the library
 build:
